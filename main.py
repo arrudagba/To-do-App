@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import cria_tasks
 import tasks_concluidas
+import gerencia_categorias  
+import edita_tasks  
 
 root = tk.Tk()
 root.title("To-Do App")
@@ -15,10 +17,13 @@ def ver_tasks_concluidas():
     tasks_concluidas.abrir_janela_concluidas(root)
 
 def criar_categoria():
-    print("Criar categoria")
+    gerencia_categorias.abrir_janela_gerenciar_categorias(root)  # Nova função
 
 def ver_categorias():
     print("Ver categorias")
+
+def editar_task(task):
+    edita_tasks.abrir_janela_editar_task(root, task)  # Nova função
 
 def deletar_task(task):
     id = task.get("id")
@@ -80,6 +85,8 @@ def atualizar_tasks():
                 task["autor"] = line.split("Autor:")[1].strip()
             elif line.startswith("Prazo:"):
                 task["data"] = line.split("Prazo:")[1].strip()
+            elif line.startswith("Categoria:"):
+                task["categoria"] = line.split("Categoria:")[1].strip()
                 tasks.append(task)
                 task = {}
 
@@ -93,14 +100,20 @@ def atualizar_tasks():
         lbl_prioridade = tk.Label(frame_task, text=f"Prioridade: {task['prioridade']}", font=("Arial", 10), bg="#f0f0f0")
         lbl_prioridade.grid(row=1, column=0, sticky="w", padx=(0, 10))
 
+        lbl_categoria = tk.Label(frame_task, text=f"Categoria: {task['categoria']}", font=("Arial", 10), bg="#f0f0f0")
+        lbl_categoria.grid(row=1, column=1, sticky="w", padx=(0, 10))
+
         lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#f0f0f0")
-        lbl_autor.grid(row=0, column=1, columnspan=2, sticky="e")
+        lbl_autor.grid(row=0, column=7, columnspan=2, sticky="e")
+
+        btn_editar = tk.Button(frame_task, text="Editar", command=lambda t=task: editar_task(t), bg="#f0f0f0")
+        btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  # Novo botão Editar
 
         btn_concluir = tk.Button(frame_task, text="Concluir", command=lambda t=task: concluir_task(t), bg="#f0f0f0")
-        btn_concluir.grid(row=1, column=1, padx=(10, 5), sticky="e")
+        btn_concluir.grid(row=1, column=5, padx=(10, 5), sticky="e")
 
         btn_deletar = tk.Button(frame_task, text="Deletar", command=lambda t=task: deletar_task(t), bg="#f0f0f0")
-        btn_deletar.grid(row=1, column=2, padx=(5, 0), sticky="e")
+        btn_deletar.grid(row=1, column=6, padx=(5, 0), sticky="e")
 
     root.after(3000, atualizar_tasks)
 
@@ -116,7 +129,7 @@ btn_ver_tasks_concluidas.pack(side=tk.LEFT)
 frame_side = tk.Frame(root, bg="#d3d3d3")
 frame_side.pack(side=tk.RIGHT, fill=tk.Y, padx=20, pady=10)
 
-btn_criar_categoria = tk.Button(frame_side, text="Criar Categoria", command=criar_categoria, width=20, bg="#f0f0f0")
+btn_criar_categoria = tk.Button(frame_side, text="Gerenciar Categorias", command=criar_categoria, width=20, bg="#f0f0f0")
 btn_criar_categoria.pack(pady=(0, 10))
 
 cmb_categorias = ttk.Combobox(frame_side, values=["All", "Categoria 1", "Categoria 2"])
@@ -135,4 +148,3 @@ frame_tasks.pack(fill=tk.BOTH, expand=True)
 atualizar_tasks()
 
 root.mainloop()
-

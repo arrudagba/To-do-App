@@ -14,6 +14,7 @@ def criar_task():
     prioridade_task = cmb_prioridade.get()
     prazo_task = entry_prazo.get().strip()
     autor_task = entry_autor.get().strip()
+    categoria_task = cmb_categoria.get()  # Nova categoria
 
     if nome_task and prioridade_task != "Selecione a Prioridade" and prazo_task and autor_task:
         with open("tasks.txt", "a") as file:
@@ -21,7 +22,8 @@ def criar_task():
             file.write(f"Nome da task: {nome_task}\n")
             file.write(f"Prioridade: {prioridade_task}\n")
             file.write(f"Autor: {autor_task}\n")
-            file.write(f"Prazo: {prazo_task}\n\n")
+            file.write(f"Prazo: {prazo_task}\n")
+            file.write(f"Categoria: {categoria_task}\n\n")  # Adicionando categoria
         messagebox.showinfo("Sucesso", "Task criada e salva com sucesso!")
         
         if entry_nome.winfo_exists():
@@ -34,7 +36,6 @@ def criar_task():
             entry_autor.delete(0, tk.END)
     else:
         messagebox.showwarning("Erro", "Por favor, preencha todos os campos.")
-
 
 def abrir_janela_nova_task(root):
     janela_nova_task = tk.Toplevel(root)
@@ -54,7 +55,7 @@ def abrir_janela_nova_task(root):
     lbl_prioridade = tk.Label(janela_nova_task, text="Prioridade:", bg="#d3d3d3", anchor="w")
     lbl_prioridade.pack(pady=(10, 5), padx=20, anchor="w")
     global cmb_prioridade
-    cmb_prioridade = ttk.Combobox(janela_nova_task, values=["Alta", "Média", "Baixa"], state="readonly")
+    cmb_prioridade = ttk.Combobox(janela_nova_task, values=["Baixa", "Média", "Alta"])
     cmb_prioridade.set("Selecione a Prioridade")
     cmb_prioridade.pack(padx=20, pady=5)
 
@@ -65,15 +66,19 @@ def abrir_janela_nova_task(root):
     entry_prazo.pack(padx=20, pady=5)
     entry_prazo.insert(0, "Escreva o prazo em dd/mm/aaaa - hh:mm")
 
-    lbl_autor = tk.Label(janela_nova_task, text="Dono da Task:", bg="#d3d3d3", anchor="w")
+    lbl_autor = tk.Label(janela_nova_task, text="Autor:", bg="#d3d3d3", anchor="w")
     lbl_autor.pack(pady=(10, 5), padx=20, anchor="w")
     global entry_autor
     entry_autor = tk.Entry(janela_nova_task, width=40)
     entry_autor.pack(padx=20, pady=5)
     entry_autor.insert(0, "Digite seu nome")
 
-    btn_criar_task = tk.Button(janela_nova_task, text="Criar task", command=criar_task, bg="#f0f0f0", width=15, height=2)
-    btn_criar_task.pack(pady=30, padx=20)
+    lbl_categoria = tk.Label(janela_nova_task, text="Categoria:", bg="#d3d3d3", anchor="w")
+    lbl_categoria.pack(pady=(10, 5), padx=20, anchor="w")
+    global cmb_categoria
+    cmb_categoria = ttk.Combobox(janela_nova_task, values=["Categoria 1", "Categoria 2", "Categoria 3"])
+    cmb_categoria.set("Selecione a Categoria")
+    cmb_categoria.pack(padx=20, pady=5) 
 
-    janela_nova_task.mainloop()
-
+    btn_criar = tk.Button(janela_nova_task, text="Criar Task", command=criar_task, bg="#f0f0f0")
+    btn_criar.pack(pady=20)
