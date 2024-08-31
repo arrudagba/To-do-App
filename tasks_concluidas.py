@@ -21,69 +21,65 @@ def update_concluded_tasks():
         with open("tasks_concluidas.txt", "r") as file:
             task = {}
             for line in file:
-                if line.startswith("Nome da task:"):
-                    if task:
-                        tasks.append(task)
-                    task = {"task": line.split(":")[1].strip()}
+                if line.startswith("Id:"):
+                    task = {"id": line.split(":")[1].strip()}
+                elif line.startswith("Nome da task:"):
+                    task["task"] = line.split(":")[1].strip()
                 elif line.startswith("Prioridade:"):
                     task["prioridade"] = line.split(":")[1].strip()
                 elif line.startswith("Autor:"):
                     task["autor"] = line.split(":")[1].strip()
                 elif line.startswith("Prazo:"):
                     task["data"] = line.split(":")[1].strip()
-            if task:
-                tasks.append(task)
+                    tasks.append(task)
+                    task = {}
     except FileNotFoundError:
         pass
 
     for task in tasks:
-        frame_task = tk.Frame(frame_tasks_concluidas, bg="lightgreen", pady=5)
+        frame_task = tk.Frame(frame_tasks_concluidas, bg="#1ebd23", pady=5)
         frame_task.pack(fill=tk.X, padx=5, pady=5)
 
-        lbl_task = tk.Label(frame_task, text=task["task"], font=("Arial", 12), bg="lightgreen")
+        lbl_task = tk.Label(frame_task, text=task["task"], font=("Arial", 12), bg="#1ebd23")
         lbl_task.grid(row=0, column=0, sticky="w", padx=(0, 10))
 
-        lbl_prioridade = tk.Label(frame_task, text=f"Prioridade: {task['prioridade']}", font=("Arial", 10), bg="lightgreen")
+        lbl_prioridade = tk.Label(frame_task, text=f"Prioridade: {task['prioridade']}", font=("Arial", 10), bg="#1ebd23")
         lbl_prioridade.grid(row=1, column=0, sticky="w", padx=(0, 10))
 
-        lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="lightgreen")
+        lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#1ebd23")
         lbl_autor.grid(row=0, column=1, columnspan=2, sticky="e")
 
-        btn_voltar = tk.Button(frame_task, text="Voltar task", command=lambda t=task: voltar_task(t), bg="lightgreen")
-        btn_voltar.grid(row=1, column=1, padx=(10, 5), sticky="e")
+        btn_voltar_task = tk.Button(frame_task, text="Voltar task", command=lambda t=task: voltar_task_concluida(t), bg="#1ebd23")
+        btn_voltar_task.grid(row=1, column=1, padx=(10, 5), sticky="e")
 
-        btn_deletar = tk.Button(frame_task, text="Deletar a task", command=lambda t=task: deletar_task_concluida(t), bg="lightgreen")
-        btn_deletar.grid(row=1, column=2, padx=(5, 0), sticky="e")
+    frame_tasks_concluidas.after(5000, update_concluded_tasks)
 
-def voltar_task(task):
-    with open("tasks_concluidas.txt", "r") as file:
-        lines = file.readlines()
+def voltar_task_concluida(task):
+    id = task.get("id")
+    task_data = []
 
-    with open("tasks_concluidas.txt", "w") as file:
-        for line in lines:
-            if line.strip("\n") != f"Nome da task: {task['task']}":
-                file.write(line)
+    with open('tasks_concluidas.txt', 'r') as file:
+        tasks = file.readlines()
 
-    with open("tasks.txt", "a") as file:
-        file.write(f"Nome da task: {task['task']}\n")
-        file.write(f"Prioridade: {task['prioridade']}\n")
-        file.write(f"Autor: {task['autor']}\n")
-        file.write(f"Prazo: {task['data']}\n")
-        file.write("\n")
+    with open('tasks_concluidas.txt', 'w') as file:
+        skip_lines = False
+        for linha in tasks:
+            if linha.startswith('Id: '):
+                current_id = linha.strip().split(': ', 1)[1]
+                skip_lines = current_id == id
+                if skip_lines:
+                    task_data.append(linha)
+            elif skip_lines:
+                task_data.append(linha)
+            else:
+                file.write(linha)
 
-    update_concluded_tasks()
-    atualizar_tasks_no_main()
-
-def deletar_task_concluida(task):
-    with open("tasks_concluidas.txt", "r") as file:
-        lines = file.readlines()
-
-    with open("tasks_concluidas.txt", "w") as file:
-        for line in lines:
-            if line.strip("\n") != f"Nome da task: {task['task']}":
-                file.write(line)
+    with open('tasks.txt', 'a') as file:
+        for linha in task_data:
+            file.write(linha)
 
     update_concluded_tasks()
+
 
 def atualizar_tasks_no_main():
     import main

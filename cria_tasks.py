@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import random
+import string
+
+def gerar_id():
+    caracteres = string.ascii_letters + string.digits 
+    id_aleatorio = ''.join(random.choice(caracteres) for _ in range(18))
+    return id_aleatorio
 
 def criar_task():
     nome_task = entry_nome.get().strip()
@@ -10,17 +17,24 @@ def criar_task():
 
     if nome_task and prioridade_task != "Selecione a Prioridade" and prazo_task and autor_task:
         with open("tasks.txt", "a") as file:
+            file.write(f"Id: {gerar_id()}\n")
             file.write(f"Nome da task: {nome_task}\n")
             file.write(f"Prioridade: {prioridade_task}\n")
             file.write(f"Autor: {autor_task}\n")
             file.write(f"Prazo: {prazo_task}\n\n")
         messagebox.showinfo("Sucesso", "Task criada e salva com sucesso!")
-        entry_nome.delete(0, tk.END)
-        cmb_prioridade.set("Selecione a Prioridade")
-        entry_prazo.delete(0, tk.END)
-        entry_autor.delete(0, tk.END)
+        
+        if entry_nome.winfo_exists():
+            entry_nome.delete(0, tk.END)
+        if cmb_prioridade.winfo_exists():
+            cmb_prioridade.set("Selecione a Prioridade")
+        if entry_prazo.winfo_exists():
+            entry_prazo.delete(0, tk.END)
+        if entry_autor.winfo_exists():
+            entry_autor.delete(0, tk.END)
     else:
         messagebox.showwarning("Erro", "Por favor, preencha todos os campos.")
+
 
 def abrir_janela_nova_task(root):
     janela_nova_task = tk.Toplevel(root)
