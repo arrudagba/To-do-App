@@ -5,6 +5,46 @@ import tasks_concluidas
 import gerencia_categorias  
 import edita_tasks
 
+class CategoriaAtualizador:
+    def __init__(self):
+        self.categorias = ["All"]
+        self.id_to_nome = {}  
+        self.ids_atualizados = set()  
+
+    def atualizar_categorias(self):
+        novos_id_para_nome = {}
+        try:
+            with open("categorias.txt", "r") as file:
+                categoria = {}
+                for line in file:
+                    if line.startswith("Id:"):
+                        categoria_id = line.split("Id:")[1].strip()
+                        categoria["id"] = categoria_id
+                    elif line.startswith("Nome:"):
+                        categoria_nome = line.split("Nome:")[1].strip()
+                        categoria["nome"] = categoria_nome
+                        novos_id_para_nome[categoria["id"]] = categoria["nome"]
+
+            self.ids_atualizados = set(novos_id_para_nome.keys())
+            categorias_atualizadas = ["All"] + [nome for id_, nome in novos_id_para_nome.items()]
+            self.categorias = categorias_atualizadas
+
+            ids_removidos = set(self.id_to_nome.keys()) - self.ids_atualizados
+
+            for id_ in ids_removidos:
+                nome = self.id_to_nome[id_]
+                if nome in self.categorias:
+                    self.categorias.remove(nome)
+                del self.id_to_nome[id_]
+
+            self.id_to_nome.update(novos_id_para_nome)
+
+        except FileNotFoundError:
+            print("O arquivo categorias.txt não foi encontrado.")
+
+    def get_categorias(self):
+        return self.categorias
+
 root = tk.Tk()
 root.title("To-Do App")
 root.geometry("1024x715")
@@ -133,9 +173,16 @@ frame_side.pack(side=tk.RIGHT, fill=tk.Y, padx=20, pady=10)
 btn_criar_categoria = tk.Button(frame_side, text="Gerenciar Categorias", command=criar_categoria, width=20, bg="#f0f0f0")
 btn_criar_categoria.pack(pady=(0, 10))
 
-cmb_categorias = ttk.Combobox(frame_side, values=gerencia_categorias.listar_categorias())
+def atualizar_combobox():
+    atualizador.atualizar_categorias()
+    cmb_categorias['values'] = atualizador.get_categorias()
+    root.after(2000, atualizar_combobox)
+
+cmb_categorias = ttk.Combobox(frame_side)
 cmb_categorias.set("Ver categorias")
 cmb_categorias.pack()
+atualizador = CategoriaAtualizador()
+atualizar_combobox()
 
 frame_main = tk.Frame(root, bg="#d3d3d3")
 frame_main.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
