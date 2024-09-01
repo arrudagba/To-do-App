@@ -3,7 +3,7 @@ from tkinter import ttk
 import cria_tasks
 import tasks_concluidas
 import gerencia_categorias  
-import edita_tasks  
+import edita_tasks 
 
 root = tk.Tk()
 root.title("To-Do App")
@@ -17,13 +17,13 @@ def ver_tasks_concluidas():
     tasks_concluidas.abrir_janela_concluidas(root)
 
 def criar_categoria():
-    gerencia_categorias.abrir_janela_gerenciar_categorias(root)  # Nova função
+    gerencia_categorias.abrir_janela_gerenciar_categorias(root)  
 
 def ver_categorias():
     print("Ver categorias")
 
 def editar_task(task):
-    edita_tasks.abrir_janela_editar_task(root, task)  # Nova função
+    edita_tasks.abrir_janela_editar_task(root, task)  
 
 def deletar_task(task):
     id = task.get("id")
