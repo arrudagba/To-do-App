@@ -97,6 +97,8 @@ def concluir_task(task):
                 skip_lines = current_id == id
                 if skip_lines:
                     task_data.append(linha)
+                else:
+                    file.write(linha)
             elif skip_lines:
                 task_data.append(linha)
             else:
