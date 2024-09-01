@@ -97,6 +97,8 @@ def concluir_task(task):
                 skip_lines = current_id == id
                 if skip_lines:
                     task_data.append(linha)
+                else:
+                    file.write(linha)
             elif skip_lines:
                 task_data.append(linha)
             else:
@@ -178,11 +180,16 @@ def atualizar_combobox():
     cmb_categorias['values'] = atualizador.get_categorias()
     root.after(2000, atualizar_combobox)
 
+def selecionar_categoria(event):
+    categoria_selecionada = cmb_categorias.get()
+    pass #seleciona categoria, mas não faz nada ainda
+
 cmb_categorias = ttk.Combobox(frame_side)
 cmb_categorias.set("Ver categorias")
 cmb_categorias.pack()
 atualizador = CategoriaAtualizador()
 atualizar_combobox()
+cmb_categorias.bind("<<ComboboxSelected>>", selecionar_categoria)
 
 frame_main = tk.Frame(root, bg="#d3d3d3")
 frame_main.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
