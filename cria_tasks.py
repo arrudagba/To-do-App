@@ -14,7 +14,7 @@ def criar_task():
     prioridade_task = cmb_prioridade.get()
     prazo_task = entry_prazo.get().strip()
     autor_task = entry_autor.get().strip()
-    categoria_task = cmb_categoria.get()  # Nova categoria
+    categoria_task = cmb_categoria.get()  
 
     if nome_task and prioridade_task != "Selecione a Prioridade" and prazo_task and autor_task:
         with open("tasks.txt", "a") as file:
@@ -23,7 +23,7 @@ def criar_task():
             file.write(f"Prioridade: {prioridade_task}\n")
             file.write(f"Autor: {autor_task}\n")
             file.write(f"Prazo: {prazo_task}\n")
-            file.write(f"Categoria: {categoria_task}\n\n")  # Adicionando categoria
+            file.write(f"Categoria: {categoria_task}\n\n")  
         messagebox.showinfo("Sucesso", "Task criada e salva com sucesso!")
         
         if entry_nome.winfo_exists():
@@ -41,6 +41,7 @@ def abrir_janela_nova_task(root):
     janela_nova_task = tk.Toplevel(root)
     janela_nova_task.title("Nova Task")
     janela_nova_task.geometry("400x500")
+    janela_nova_task.resizable(False, False)
     janela_nova_task.configure(bg="#d3d3d3")
 
     lbl_title = tk.Label(janela_nova_task, text="Nova Task", font=("Arial", 18), bg="#d3d3d3", anchor="w")

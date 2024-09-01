@@ -3,11 +3,12 @@ from tkinter import ttk
 import cria_tasks
 import tasks_concluidas
 import gerencia_categorias  
-import edita_tasks 
+import edita_tasks
 
 root = tk.Tk()
 root.title("To-Do App")
 root.geometry("1024x715")
+root.resizable(False, False)
 root.configure(bg="#d3d3d3")  
 
 def nova_task():
@@ -107,7 +108,7 @@ def atualizar_tasks():
         lbl_autor.grid(row=0, column=7, columnspan=2, sticky="e")
 
         btn_editar = tk.Button(frame_task, text="Editar", command=lambda t=task: editar_task(t), bg="#f0f0f0")
-        btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  # Novo botão Editar
+        btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  
 
         btn_concluir = tk.Button(frame_task, text="Concluir", command=lambda t=task: concluir_task(t), bg="#f0f0f0")
         btn_concluir.grid(row=1, column=5, padx=(10, 5), sticky="e")
@@ -132,7 +133,7 @@ frame_side.pack(side=tk.RIGHT, fill=tk.Y, padx=20, pady=10)
 btn_criar_categoria = tk.Button(frame_side, text="Gerenciar Categorias", command=criar_categoria, width=20, bg="#f0f0f0")
 btn_criar_categoria.pack(pady=(0, 10))
 
-cmb_categorias = ttk.Combobox(frame_side, values=["All", "Categoria 1", "Categoria 2"])
+cmb_categorias = ttk.Combobox(frame_side, values=gerencia_categorias.listar_categorias())
 cmb_categorias.set("Ver categorias")
 cmb_categorias.pack()
 

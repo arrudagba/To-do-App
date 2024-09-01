@@ -4,6 +4,7 @@ def abrir_janela_concluidas(root):
     janela_concluidas = tk.Toplevel(root)
     janela_concluidas.title("Tasks Concluídas")
     janela_concluidas.geometry("500x600")
+    janela_concluidas.resizable(False, False)
     janela_concluidas.configure(bg="#d3d3d3")
 
     global frame_tasks_concluidas
@@ -49,7 +50,7 @@ def update_concluded_tasks():
         lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#1ebd23")
         lbl_autor.grid(row=0, column=1, columnspan=2, sticky="e")
 
-        btn_voltar_task = tk.Button(frame_task, text="Voltar task", command=lambda t=task: voltar_task_concluida(t), bg="#1ebd23")
+        btn_voltar_task = tk.Button(frame_task, text="Voltar task", command=lambda t=task: voltar_task_concluida(t), bg="#cc0a17")
         btn_voltar_task.grid(row=1, column=1, padx=(10, 5), sticky="e")
 
     frame_tasks_concluidas.after(5000, update_concluded_tasks)

@@ -45,6 +45,7 @@ def abrir_janela_editar_task(root, task):
     janela_editar = tk.Toplevel(root)
     janela_editar.title("Editar Task")
     janela_editar.geometry("400x500")
+    janela_editar.resizable(False, False)
     janela_editar.configure(bg="#d3d3d3")
 
     global entry_nome, cmb_prioridade, entry_prazo, entry_autor, cmb_categoria

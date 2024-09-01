@@ -90,6 +90,7 @@ def abrir_janela_gerenciar_categorias(root):
     janela_gerenciar = tk.Toplevel(root)
     janela_gerenciar.title("Gerenciar Categorias")
     janela_gerenciar.geometry("400x500")
+    janela_gerenciar.resizable(False, False)
     janela_gerenciar.configure(bg="#d3d3d3")
 
     global listbox_categorias
