@@ -182,7 +182,8 @@ def atualizar_combobox():
 
 def selecionar_categoria(event):
     categoria_selecionada = cmb_categorias.get()
-    pass #seleciona categoria, mas não faz nada ainda
+    lbl_categoria.config(text=f"Categoria: {categoria_selecionada}")
+    return categoria_selecionada
 
 cmb_categorias = ttk.Combobox(frame_side)
 cmb_categorias.set("Ver categorias")
