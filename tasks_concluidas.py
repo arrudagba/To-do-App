@@ -1,5 +1,21 @@
 import tkinter as tk
 
+def deletar_task_concluida(task):
+    id = task.get("id")
+    with open("tasks_concluidas.txt", 'r', encoding='utf-8') as arquivo:
+        linhas = arquivo.readlines()
+
+    with open("tasks_concluidas.txt", 'w', encoding='utf-8') as arquivo:
+        skip_lines = False
+        for linha in linhas:
+            if linha.startswith('Id: '):
+                current_id = linha.strip().split(': ', 1)[1]
+                skip_lines = current_id == id
+            if not skip_lines:
+                arquivo.write(linha)
+                
+    update_concluded_tasks()
+
 def abrir_janela_concluidas(root):
     janela_concluidas = tk.Toplevel(root)
     janela_concluidas.title("Tasks Concluídas")
@@ -52,6 +68,9 @@ def update_concluded_tasks():
 
         btn_voltar_task = tk.Button(frame_task, text="Voltar task", command=lambda t=task: voltar_task_concluida(t), bg="#cc0a17")
         btn_voltar_task.grid(row=1, column=1, padx=(10, 5), sticky="e")
+        
+        btn_deletar_task = tk.Button(frame_task, text="Deletar task", command=lambda t=task: deletar_task_concluida(t), bg="#cc0a17")
+        btn_deletar_task.grid(row=1, column=2, padx=(10, 5), sticky="e")
 
     frame_tasks_concluidas.after(5000, update_concluded_tasks)
 
