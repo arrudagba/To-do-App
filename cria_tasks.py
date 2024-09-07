@@ -4,6 +4,46 @@ from tkinter import messagebox
 import random
 import string
 
+class CategoriaAtualizador:
+    def __init__(self):
+        self.categorias = ["All"]
+        self.id_to_nome = {}  
+        self.ids_atualizados = set()  
+
+    def atualizar_categorias(self):
+        novos_id_para_nome = {}
+        try:
+            with open("categorias.txt", "r") as file:
+                categoria = {}
+                for line in file:
+                    if line.startswith("Id:"):
+                        categoria_id = line.split("Id:")[1].strip()
+                        categoria["id"] = categoria_id
+                    elif line.startswith("Nome:"):
+                        categoria_nome = line.split("Nome:")[1].strip()
+                        categoria["nome"] = categoria_nome
+                        novos_id_para_nome[categoria["id"]] = categoria["nome"]
+
+            self.ids_atualizados = set(novos_id_para_nome.keys())
+            categorias_atualizadas = ["All"] + [nome for id_, nome in novos_id_para_nome.items()]
+            self.categorias = categorias_atualizadas
+
+            ids_removidos = set(self.id_to_nome.keys()) - self.ids_atualizados
+
+            for id_ in ids_removidos:
+                nome = self.id_to_nome[id_]
+                if nome in self.categorias:
+                    self.categorias.remove(nome)
+                del self.id_to_nome[id_]
+
+            self.id_to_nome.update(novos_id_para_nome)
+
+        except FileNotFoundError:
+            print("O arquivo categorias.txt não foi encontrado.")
+
+    def get_categorias(self):
+        return self.categorias
+
 def gerar_id():
     caracteres = string.ascii_letters + string.digits 
     id_aleatorio = ''.join(random.choice(caracteres) for _ in range(18))
@@ -76,10 +116,20 @@ def abrir_janela_nova_task(root):
 
     lbl_categoria = tk.Label(janela_nova_task, text="Categoria:", bg="#d3d3d3", anchor="w")
     lbl_categoria.pack(pady=(10, 5), padx=20, anchor="w")
+
     global cmb_categoria
-    cmb_categoria = ttk.Combobox(janela_nova_task, values=["Categoria 1", "Categoria 2", "Categoria 3"])
-    cmb_categoria.set("Selecione a Categoria")
+    cmb_categoria = ttk.Combobox(janela_nova_task)
+    cmb_categoria.set("Ver categorias")
     cmb_categoria.pack(padx=20, pady=5) 
+
+    def atualizar_combobox():
+        if janela_nova_task.winfo_exists(): 
+            atualizador.atualizar_categorias()
+            cmb_categoria['values'] = atualizador.get_categorias()
+            janela_nova_task.after(2000, atualizar_combobox)  
+
+    atualizador = CategoriaAtualizador()
+    atualizar_combobox()
 
     btn_criar = tk.Button(janela_nova_task, text="Criar Task", command=criar_task, bg="#f0f0f0")
     btn_criar.pack(pady=20)
