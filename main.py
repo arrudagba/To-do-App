@@ -5,6 +5,8 @@ import tasks_concluidas
 import gerencia_categorias  
 import edita_tasks
 
+categoria = "All"  
+
 class CategoriaAtualizador:
     def __init__(self):
         self.categorias = ["All"]
@@ -60,9 +62,6 @@ def ver_tasks_concluidas():
 def criar_categoria():
     gerencia_categorias.abrir_janela_gerenciar_categorias(root)  
 
-def ver_categorias():
-    print("Ver categorias")
-
 def editar_task(task):
     edita_tasks.abrir_janela_editar_task(root, task)  
 
@@ -80,7 +79,7 @@ def deletar_task(task):
             if not skip_lines:
                 arquivo.write(linha)
 
-    atualizar_tasks()
+    atualizar_tasks(categoria)
 
 def concluir_task(task):
     id = task.get("id")
@@ -108,9 +107,9 @@ def concluir_task(task):
         for linha in task_data:
             file.write(linha)
 
-    atualizar_tasks()
+    atualizar_tasks(categoria)
 
-def atualizar_tasks():
+def atualizar_tasks(categoria):
     for widget in frame_tasks.winfo_children():
         widget.destroy()
 
@@ -133,32 +132,35 @@ def atualizar_tasks():
                 tasks.append(task)
                 task = {}
 
+    prioridades_ordem = {"Alta": 1, "Media": 2, "Baixa": 3}
+
+    tasks.sort(key=lambda t: prioridades_ordem.get(t["prioridade"], 3)) 
+
     for task in tasks:
-        frame_task = tk.Frame(frame_tasks, bg="#f0f0f0", pady=5)
-        frame_task.pack(fill=tk.X, padx=5, pady=5)
+        if categoria == "All" or task['categoria'] == categoria:
+            frame_task = tk.Frame(frame_tasks, bg="#f0f0f0", pady=5)
+            frame_task.pack(fill=tk.X, padx=5, pady=5)
 
-        lbl_task = tk.Label(frame_task, text=task["task"], font=("Arial", 12), bg="#f0f0f0")
-        lbl_task.grid(row=0, column=0, sticky="w", padx=(0, 10))
+            lbl_task = tk.Label(frame_task, text=task["task"], font=("Arial", 12), bg="#f0f0f0")
+            lbl_task.grid(row=0, column=0, sticky="w", padx=(0, 10))
 
-        lbl_prioridade = tk.Label(frame_task, text=f"Prioridade: {task['prioridade']}", font=("Arial", 10), bg="#f0f0f0")
-        lbl_prioridade.grid(row=1, column=0, sticky="w", padx=(0, 10))
+            lbl_prioridade = tk.Label(frame_task, text=f"Prioridade: {task['prioridade']}", font=("Arial", 10), bg="#f0f0f0")
+            lbl_prioridade.grid(row=1, column=0, sticky="w", padx=(0, 10))
 
-        lbl_categoria = tk.Label(frame_task, text=f"Categoria: {task['categoria']}", font=("Arial", 10), bg="#f0f0f0")
-        lbl_categoria.grid(row=1, column=1, sticky="w", padx=(0, 10))
+            lbl_categoria = tk.Label(frame_task, text=f"Categoria: {task['categoria']}", font=("Arial", 10), bg="#f0f0f0")
+            lbl_categoria.grid(row=1, column=1, sticky="w", padx=(0, 10))
 
-        lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#f0f0f0")
-        lbl_autor.grid(row=0, column=7, columnspan=2, sticky="e")
+            lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#f0f0f0")
+            lbl_autor.grid(row=0, column=7, columnspan=2, sticky="e")
 
-        btn_editar = tk.Button(frame_task, text="Editar", command=lambda t=task: editar_task(t), bg="#f0f0f0")
-        btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  
+            btn_editar = tk.Button(frame_task, text="Editar", command=lambda t=task: editar_task(t), bg="#f0f0f0")
+            btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  
 
-        btn_concluir = tk.Button(frame_task, text="Concluir", command=lambda t=task: concluir_task(t), bg="#f0f0f0")
-        btn_concluir.grid(row=1, column=5, padx=(10, 5), sticky="e")
+            btn_concluir = tk.Button(frame_task, text="Concluir", command=lambda t=task: concluir_task(t), bg="#f0f0f0")
+            btn_concluir.grid(row=1, column=5, padx=(10, 5), sticky="e")
 
-        btn_deletar = tk.Button(frame_task, text="Deletar", command=lambda t=task: deletar_task(t), bg="#f0f0f0")
-        btn_deletar.grid(row=1, column=6, padx=(5, 0), sticky="e")
-
-    root.after(3000, atualizar_tasks)
+            btn_deletar = tk.Button(frame_task, text="Deletar", command=lambda t=task: deletar_task(t), bg="#f0f0f0")
+            btn_deletar.grid(row=1, column=6, padx=(5, 0), sticky="e")
 
 frame_top = tk.Frame(root, bg="#d3d3d3")
 frame_top.pack(fill=tk.X, padx=20, pady=10)
@@ -178,29 +180,47 @@ btn_criar_categoria.pack(pady=(0, 10))
 def atualizar_combobox():
     atualizador.atualizar_categorias()
     cmb_categorias['values'] = atualizador.get_categorias()
-    root.after(2000, atualizar_combobox)
+    root.after(3000, atualizar_combobox) 
+
+def atualizar_tasks_periodicamente():
+    global categoria
+    atualizar_tasks(categoria)
+    root.after(3000, atualizar_tasks_periodicamente)
 
 def selecionar_categoria(event):
+    global categoria
     categoria_selecionada = cmb_categorias.get()
     lbl_categoria.config(text=f"Categoria: {categoria_selecionada}")
-    return categoria_selecionada
+    categoria = categoria_selecionada
+    atualizar_tasks(categoria)
 
 cmb_categorias = ttk.Combobox(frame_side)
-cmb_categorias.set("Ver categorias")
-cmb_categorias.pack()
-atualizador = CategoriaAtualizador()
-atualizar_combobox()
+cmb_categorias.set("Ver Categorias")
+cmb_categorias.pack(pady=(0, 10))
 cmb_categorias.bind("<<ComboboxSelected>>", selecionar_categoria)
 
 frame_main = tk.Frame(root, bg="#d3d3d3")
-frame_main.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+frame_main.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=20, pady=10)
 
-lbl_categoria = tk.Label(frame_main, text="Categoria: All", anchor="w", bg="#d3d3d3")
-lbl_categoria.pack(fill=tk.X, pady=(0, 5))
+lbl_categoria = tk.Label(frame_main, text="Categoria: All", bg="#d3d3d3")
+lbl_categoria.pack(anchor="w")
 
-frame_tasks = tk.Frame(frame_main, bg="white", bd=1, relief=tk.SOLID)
-frame_tasks.pack(fill=tk.BOTH, expand=True)
+canvas_tasks = tk.Canvas(frame_main, bg="#ffffff")
+canvas_tasks.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-atualizar_tasks()
+scrollbar_tasks = tk.Scrollbar(frame_main, orient="vertical", command=canvas_tasks.yview)
+scrollbar_tasks.pack(side=tk.RIGHT, fill="y")
+
+canvas_tasks.configure(yscrollcommand=scrollbar_tasks.set)
+
+frame_tasks = tk.Frame(canvas_tasks, bg="#ffffff")
+canvas_tasks.create_window((0, 0), window=frame_tasks, anchor="nw")
+
+frame_tasks.bind("<Configure>", lambda e: canvas_tasks.configure(scrollregion=canvas_tasks.bbox("all")))
+
+
+atualizador = CategoriaAtualizador()
+atualizar_combobox()
+atualizar_tasks_periodicamente()
 
 root.mainloop()
