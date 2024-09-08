@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkcalendar import Calendar
+from tktimepicker import AnalogPicker, AnalogThemes, constants
+
 
 class CategoriaAtualizador:
     def __init__(self):
@@ -86,7 +89,7 @@ def salvar_edicao(task, janela_editar):
 def abrir_janela_editar_task(root, task):
     janela_editar = tk.Toplevel(root)
     janela_editar.title("Editar Task")
-    janela_editar.geometry("400x500")
+    janela_editar.geometry("400x550")
     janela_editar.resizable(False, False)
     janela_editar.configure(bg="#d3d3d3")
 
@@ -112,6 +115,49 @@ def abrir_janela_editar_task(root, task):
     entry_prazo = tk.Entry(janela_editar, width=40)
     entry_prazo.insert(0, task["data"])
     entry_prazo.pack(padx=20, pady=5)
+
+    def escolher_data():
+            def selecionar_data():
+                data_selecionada = cal.get_date()
+                prazo_atual = entry_prazo.get().strip()
+                entry_prazo.delete(0, tk.END)
+                entry_prazo.insert(0, f"{data_selecionada} - {prazo_atual.split(' - ')[-1] if ' - ' in prazo_atual else ''}")
+                janela_data.destroy()
+
+            janela_data = tk.Toplevel(janela_editar)
+            janela_data.geometry("300x300")
+            cal = Calendar(janela_data, selectmode='day')
+            cal.pack(pady=20)
+
+            btn_selecionar_data = tk.Button(janela_data, text="Selecionar Data", command=selecionar_data)
+            btn_selecionar_data.pack(pady=20)
+
+    def escolher_hora():
+        def selecionar_hora(time):
+            hora_selecionada = "{}:{} {}".format(*time)
+            prazo_atual = entry_prazo.get().strip()
+            entry_prazo.delete(0, tk.END)
+            entry_prazo.insert(0, f"{prazo_atual.split(' - ')[0] if ' - ' in prazo_atual else prazo_atual} {hora_selecionada}")
+            janela_hora.destroy()
+
+        janela_hora = tk.Toplevel(janela_editar)
+        time_picker = AnalogPicker(janela_hora, type=constants.HOURS12)
+        time_picker.pack(expand=True, fill="both")
+
+        theme = AnalogThemes(time_picker)
+        theme.setDracula()
+
+        btn_selecionar_hora = tk.Button(janela_hora, text="Selecionar Hora", command=lambda: selecionar_hora(time_picker.time()))
+        btn_selecionar_hora.pack()
+
+    frame_botoes = tk.Frame(janela_editar, bg="#d3d3d3")
+    frame_botoes.pack(pady=5)
+
+    btn_escolher_data = tk.Button(frame_botoes, text="Escolher Data", command=escolher_data, bg="#f0f0f0")
+    btn_escolher_data.pack(side="left", padx=10)
+
+    btn_escolher_hora = tk.Button(frame_botoes, text="Escolher Hora", command=escolher_hora, bg="#f0f0f0")
+    btn_escolher_hora.pack(side="left", padx=10)
 
     lbl_autor = tk.Label(janela_editar, text="Autor:", bg="#d3d3d3", anchor="w")
     lbl_autor.pack(pady=(10, 5), padx=20, anchor="w")

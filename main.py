@@ -162,7 +162,7 @@ def atualizar_tasks(categoria):
             lbl_categoria.grid(row=1, column=2, sticky="w", padx=(0, 10))
 
             lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#f0f0f0")
-            lbl_autor.grid(row=0, column=7, columnspan=2, sticky="e")
+            lbl_autor.grid(row=0, column=6, columnspan=4, sticky="e")
 
             btn_editar = tk.Button(frame_task, text="Editar", command=lambda t=task: editar_task(t), bg="#f0f0f0")
             btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  
