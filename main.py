@@ -147,8 +147,19 @@ def atualizar_tasks(categoria):
             lbl_prioridade = tk.Label(frame_task, text=f"Prioridade: {task['prioridade']}", font=("Arial", 10), bg="#f0f0f0")
             lbl_prioridade.grid(row=1, column=0, sticky="w", padx=(0, 10))
 
+            if task["prioridade"] == "Alta":
+                cor_circulo = "red"
+            elif task["prioridade"] == "Media":
+                cor_circulo = "yellow"
+            else:  
+                cor_circulo = "green"
+
+            canvas = tk.Canvas(frame_task, width=20, height=20, bg="#f0f0f0", highlightthickness=0)
+            canvas.create_oval(5, 5, 15, 15, fill=cor_circulo, outline="")
+            canvas.grid(row=1, column=1, sticky="w", padx=(0, 10))
+
             lbl_categoria = tk.Label(frame_task, text=f"Categoria: {task['categoria']}", font=("Arial", 10), bg="#f0f0f0")
-            lbl_categoria.grid(row=1, column=1, sticky="w", padx=(0, 10))
+            lbl_categoria.grid(row=1, column=2, sticky="w", padx=(0, 10))
 
             lbl_autor = tk.Label(frame_task, text=f"Autor: {task['autor']} - {task['data']}", font=("Arial", 10), bg="#f0f0f0")
             lbl_autor.grid(row=0, column=7, columnspan=2, sticky="e")
