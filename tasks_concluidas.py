@@ -77,6 +77,7 @@ def update_concluded_tasks():
 def voltar_task_concluida(task):
     id = task.get("id")
     task_data = []
+    copy_task = False  
 
     with open('tasks_concluidas.txt', 'r') as file:
         tasks = file.readlines()
@@ -86,20 +87,20 @@ def voltar_task_concluida(task):
         for linha in tasks:
             if linha.startswith('Id: '):
                 current_id = linha.strip().split(': ', 1)[1]
-                skip_lines = current_id == id
-                if skip_lines:
-                    task_data.append(linha)
-            elif skip_lines:
-                task_data.append(linha)
-            else:
-                file.write(linha)
+                skip_lines = current_id == id  
+                copy_task = skip_lines  
+            if not skip_lines:
+                file.write(linha)  
+            if copy_task:
+                task_data.append(linha)  
+                if linha == '\n':  
+                    copy_task = False
 
     with open('tasks.txt', 'a') as file:
         for linha in task_data:
             file.write(linha)
 
     update_concluded_tasks()
-
 
 def atualizar_tasks_no_main():
     import main
