@@ -7,12 +7,12 @@ Simple task manager app made with Tkinter.
 
 ## Usage
 
-Install all the files from repo and install tk
+Install all the files from repo and install the requirements.
 
 ```bash
   git clone https://github.com/arrudagba/To-do-App
   cd To-do-App
-  pip install tk
+  pip install requirements.txt
   python3 main.py
 ```
     
@@ -23,5 +23,5 @@ Install all the files from repo and install tk
 
 ## Screenshots
 
-![MainPage](https://i.imgur.com/7pohgi2_d.jpg?maxwidth=520&shape=thumb&fidelity=high)
+![MainPage](https://i.imgur.com/1xaEUtS_d.jpg?maxwidth=520&shape=thumb&fidelity=high)
 
