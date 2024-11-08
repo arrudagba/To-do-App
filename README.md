@@ -16,10 +16,6 @@ Install all the files from repo and install the requirements.
   python3 main.py
 ```
     
-## Documentation
-
-[Documentation](https://docs.python.org/3/library/tkinter.html)
-
 
 ## Screenshots
 
