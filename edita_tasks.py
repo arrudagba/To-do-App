@@ -4,6 +4,7 @@ from tkinter import messagebox
 from tkcalendar import Calendar
 from tktimepicker import AnalogPicker, AnalogThemes, constants
 
+__all__ = ['abrir_janela_editar_task']
 
 class CategoriaAtualizador:
     def __init__(self):
@@ -14,7 +15,7 @@ class CategoriaAtualizador:
     def atualizar_categorias(self):
         novos_id_para_nome = {}
         try:
-            with open("categorias.txt", "r") as file:
+            with open("categorias.txt", "r", encoding="utf-8") as file:
                 categoria = {}
                 for line in file:
                     if line.startswith("Id:"):
@@ -56,10 +57,10 @@ def salvar_edicao(task, janela_editar):
     nova_categoria = cmb_categoria.get().strip()
 
     if novo_nome and nova_prioridade != "Selecione a Prioridade" and novo_prazo and novo_autor:
-        with open("tasks.txt", "r") as arquivo:
+        with open("tasks.txt", "r", encoding="utf-8") as arquivo:
             linhas = arquivo.readlines()
 
-        with open("tasks.txt", "w") as arquivo:
+        with open("tasks.txt", "w", encoding="utf-8") as arquivo:
             skip_lines = False
             for linha in linhas:
                 if linha.startswith('Id: '):

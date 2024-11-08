@@ -6,6 +6,8 @@ from tktimepicker import AnalogPicker, AnalogThemes, constants
 import random
 import string
 
+__all__ = ['abrir_janela_nova_task']
+
 class CategoriaAtualizador:
     def __init__(self):
         self.categorias = ["All"]
@@ -59,7 +61,7 @@ def criar_task():
     categoria_task = cmb_categoria.get()  
 
     if nome_task and prioridade_task != "Selecione a Prioridade" and prazo_task and autor_task:
-        with open("tasks.txt", "a") as file:
+        with open("tasks.txt", "a", encoding="utf-8") as file:
             file.write(f"Id: {gerar_id()}\n")
             file.write(f"Nome da task: {nome_task}\n")
             file.write(f"Prioridade: {prioridade_task}\n")
@@ -98,7 +100,7 @@ def abrir_janela_nova_task(root):
     lbl_prioridade = tk.Label(janela_nova_task, text="Prioridade:", bg="#d3d3d3", anchor="w")
     lbl_prioridade.pack(pady=(10, 5), padx=20, anchor="w")
     global cmb_prioridade
-    cmb_prioridade = ttk.Combobox(janela_nova_task, values=["Baixa", "Media", "Alta"])
+    cmb_prioridade = ttk.Combobox(janela_nova_task, values=["Baixa", "Média", "Alta"])
     cmb_prioridade.set("Selecione a Prioridade")
     cmb_prioridade.pack(padx=20, pady=5)
 

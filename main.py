@@ -16,7 +16,7 @@ class CategoriaAtualizador:
     def atualizar_categorias(self):
         novos_id_para_nome = {}
         try:
-            with open("categorias.txt", "r") as file:
+            with open("categorias.txt", "r", encoding="utf-8") as file:
                 categoria = {}
                 for line in file:
                     if line.startswith("Id:"):
@@ -85,10 +85,10 @@ def concluir_task(task):
     id = task.get("id")
     task_data = []
     
-    with open('tasks.txt', 'r') as file:
+    with open('tasks.txt', 'r', encoding="utf-8") as file:
         tasks = file.readlines()
 
-    with open('tasks.txt', 'w') as file:
+    with open('tasks.txt', 'w', encoding="utf-8") as file:
         skip_lines = False
         for linha in tasks:
             if linha.startswith('Id: '):
@@ -103,7 +103,7 @@ def concluir_task(task):
             else:
                 file.write(linha)
 
-    with open('tasks_concluidas.txt', 'a') as file:
+    with open('tasks_concluidas.txt', 'a', encoding="utf-8") as file:
         for linha in task_data:
             file.write(linha)
 
@@ -114,7 +114,7 @@ def atualizar_tasks(categoria):
         widget.destroy()
 
     tasks = []
-    with open("tasks.txt", "r") as file:
+    with open("tasks.txt", "r", encoding="utf-8") as file:
         task = {}
         for line in file:
             if line.startswith("Id:"):

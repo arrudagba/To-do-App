@@ -3,6 +3,8 @@ from tkinter import simpledialog, messagebox
 import random
 import string
 
+__all__ = ['abrir_janela_gerenciar_categorias']
+
 categorias = []
 
 def gerar_id():
@@ -17,7 +19,7 @@ def atualizar_lista_categorias(listbox):
         listbox.insert(tk.END, categoria)
 
 def cria_categoria(nome_categoria):
-    with open("categorias.txt", "a") as file:
+    with open("categorias.txt", "a", encoding="utf-8") as file:
         file.write(f"Id: {gerar_id()}\n")
         file.write(f"Nome: {nome_categoria}\n\n")
 
@@ -38,7 +40,7 @@ def deletar_categoria_por_nome(nome_categoria):
     id_categoria = None
     linha_anterior = None  
 
-    with open("categorias.txt", "r") as file:
+    with open("categorias.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
         for line in lines:
             if line.startswith("Nome:") and line.strip().split(': ', 1)[1] == nome_categoria:
@@ -56,7 +58,7 @@ def deletar_categoria_por_nome(nome_categoria):
 
 def listar_categorias():
     categorias = ["All"]
-    with open("categorias.txt", "r") as file:
+    with open("categorias.txt", "r", encoding="utf-8") as file:
         categoria = {}
         for line in file:
             if line.startswith("Id:"):

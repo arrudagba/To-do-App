@@ -1,5 +1,7 @@
 import tkinter as tk
 
+__all__ = ['abrir_janela_concluidas']
+
 def deletar_task_concluida(task):
     id = task.get("id")
     with open("tasks_concluidas.txt", 'r', encoding='utf-8') as arquivo:
@@ -35,7 +37,7 @@ def update_concluded_tasks():
 
     tasks = []
     try:
-        with open("tasks_concluidas.txt", "r") as file:
+        with open("tasks_concluidas.txt", "r", encoding="utf-8") as file:
             task = {}
             for line in file:
                 if line.startswith("Id:"):
@@ -79,10 +81,10 @@ def voltar_task_concluida(task):
     task_data = []
     copy_task = False  
 
-    with open('tasks_concluidas.txt', 'r') as file:
+    with open('tasks_concluidas.txt', 'r', encoding="utf-8") as file:
         tasks = file.readlines()
 
-    with open('tasks_concluidas.txt', 'w') as file:
+    with open('tasks_concluidas.txt', 'w', encoding="utf-8") as file:
         skip_lines = False
         for linha in tasks:
             if linha.startswith('Id: '):
@@ -96,7 +98,7 @@ def voltar_task_concluida(task):
                 if linha == '\n':  
                     copy_task = False
 
-    with open('tasks.txt', 'a') as file:
+    with open('tasks.txt', 'a', encoding="utf-8") as file:
         for linha in task_data:
             file.write(linha)
 
