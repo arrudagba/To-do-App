@@ -3,87 +3,82 @@ from tkinter import simpledialog, messagebox
 import random
 import string
 
-__all__ = ['abrir_janela_gerenciar_categorias']
+categorias = [{"id": "0", "nome": "All"}]  
 
-categorias = []
+__all__ = ['categorias']
+
+def carregar_categorias():
+    try:
+        with open('categorias.txt', 'r', encoding="utf-8") as f:
+            conteudo = f.read().strip()  
+            if not conteudo:
+                return
+            
+            categorias_arq = conteudo.split('\n\n')  
+            for categoria in categorias_arq:
+                linhas = categoria.split('\n')
+                
+                try:
+                    id_ = linhas[0].split(': ')[1]
+                    nome = linhas[1].split(': ')[1]
+                    
+                    if nome == "All" and any(cat['nome'] == "All" for cat in categorias):
+                        continue  
+                    
+                    categorias.append({
+                        'id': id_,
+                        'nome': nome,
+                    })
+                except IndexError:
+                    print("Erro ao processar dados de uma categoria. Ignorando esta entrada.")
+                    continue
+
+    except FileNotFoundError:
+        return 
+
 
 def gerar_id():
     caracteres = string.ascii_letters + string.digits
     id_aleatorio = ''.join(random.choice(caracteres) for _ in range(18))
     return id_aleatorio
 
+def cria_categorias(nome_categoria):
+    global categorias
+    categoria = {
+        "id": gerar_id(),
+        "nome": nome_categoria
+    }
+    categorias.append(categoria)
+
+def buscar_id_por_nome(nome_categoria):
+    for e in categorias:
+        if e['nome'] == nome_categoria:
+            return e['id']
+    return None
+
 def atualizar_lista_categorias(listbox):
+    global categorias
     listbox.delete(0, tk.END)
-    categorias = listar_categorias()[1:]
     for categoria in categorias:
-        listbox.insert(tk.END, categoria)
-
-def cria_categoria(nome_categoria):
-    with open("categorias.txt", "a", encoding="utf-8") as file:
-        file.write(f"Id: {gerar_id()}\n")
-        file.write(f"Nome: {nome_categoria}\n\n")
-
-def deleta_categoria(id_categoria):
-    with open("categorias.txt", 'r', encoding='utf-8') as arquivo:
-        linhas = arquivo.readlines()
-
-    with open("categorias.txt", 'w', encoding='utf-8') as arquivo:
-        skip_lines = False
-        for linha in linhas:
-            if linha.startswith('Id: '):
-                current_id = linha.strip().split(': ', 1)[1]
-                skip_lines = current_id == id_categoria
-            if not skip_lines:
-                arquivo.write(linha)
-
-def deletar_categoria_por_nome(nome_categoria):
-    id_categoria = None
-    linha_anterior = None  
-
-    with open("categorias.txt", "r", encoding="utf-8") as file:
-        lines = file.readlines()
-        for line in lines:
-            if line.startswith("Nome:") and line.strip().split(': ', 1)[1] == nome_categoria:
-                if linha_anterior and linha_anterior.startswith("Id:"):
-                    id_categoria = linha_anterior.strip().split("Id: ", 1)[1]
-                break
-            linha_anterior = line  
-
-    if id_categoria:
-        deleta_categoria(id_categoria)
-        messagebox.showinfo("Sucesso", f"Categoria '{nome_categoria}' deletada com sucesso!")
-    else:
-        messagebox.showerror("Erro", "Categoria não encontrada.")
-
-
-def listar_categorias():
-    categorias = ["All"]
-    with open("categorias.txt", "r", encoding="utf-8") as file:
-        categoria = {}
-        for line in file:
-            if line.startswith("Id:"):
-                categoria = {"id": line.split("Id:")[1].strip()}
-            elif line.startswith("Nome:"):
-                categoria["nome"] = line.split("Nome:")[1].strip()
-                categorias.append(categoria["nome"])
-    return categorias
+        if categoria['nome'] != "All":
+            listbox.insert(tk.END, categoria['nome'])
 
 def adicionar_categoria(janela_gerenciar):
+    global categorias
     nova_categoria = simpledialog.askstring("Adicionar Categoria", "Digite o nome da nova categoria:")
     if nova_categoria and nova_categoria.strip() != "":
-        categorias.append(nova_categoria.strip())
-        cria_categoria(nova_categoria.strip())
+        cria_categorias(nova_categoria.strip())
         atualizar_lista_categorias(listbox_categorias)
     else:
         messagebox.showwarning("Erro", "Por favor, digite um nome válido para a categoria.")
 
 def remover_categoria(janela_gerenciar):
+    global categorias
     selecionado = listbox_categorias.curselection()
     if selecionado:
-        categoria = listbox_categorias.get(selecionado)
-        categorias = listar_categorias()[1:]
-        categorias.remove(categoria)
-        deletar_categoria_por_nome(categoria)
+        nome_categoria = listbox_categorias.get(selecionado)
+        categoria_id = buscar_id_por_nome(nome_categoria)
+        categorias = [categoria for categoria in categorias if categoria['id'] != categoria_id]
         atualizar_lista_categorias(listbox_categorias)
     else:
         messagebox.showwarning("Erro", "Por favor, selecione uma categoria para remover.")

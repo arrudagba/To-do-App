@@ -3,90 +3,54 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkcalendar import Calendar
 from tktimepicker import AnalogPicker, AnalogThemes, constants
+import cria_tasks
+import gerencia_categorias
 
-__all__ = ['abrir_janela_editar_task']
+def editar_task(id, janela_editar):
+    task_para_editar = None
+    for task in cria_tasks.tasks:
+        if task['id'] == id:
+            task_para_editar = task
+            break
 
-class CategoriaAtualizador:
-    def __init__(self):
-        self.categorias = ["All"]
-        self.id_to_nome = {}  
-        self.ids_atualizados = set()  
+    if task_para_editar:
+        novo_nome = entry_nome.get().strip()
+        nova_prioridade = cmb_prioridade.get()
+        novo_prazo = entry_prazo.get().strip()
+        novo_autor = entry_autor.get().strip()
+        nova_categoria = cmb_categoria.get().strip()
 
-    def atualizar_categorias(self):
-        novos_id_para_nome = {}
-        try:
-            with open("categorias.txt", "r", encoding="utf-8") as file:
-                categoria = {}
-                for line in file:
-                    if line.startswith("Id:"):
-                        categoria_id = line.split("Id:")[1].strip()
-                        categoria["id"] = categoria_id
-                    elif line.startswith("Nome:"):
-                        categoria_nome = line.split("Nome:")[1].strip()
-                        categoria["nome"] = categoria_nome
-                        novos_id_para_nome[categoria["id"]] = categoria["nome"]
+        if novo_nome and nova_prioridade != "Selecione a Prioridade" and novo_prazo and novo_autor:
+            task_para_editar['nome'] = novo_nome
+            task_para_editar['prioridade'] = nova_prioridade
+            task_para_editar['prazo'] = novo_prazo
+            task_para_editar['autor'] = novo_autor
+            task_para_editar['categoria'] = nova_categoria
 
-            self.ids_atualizados = set(novos_id_para_nome.keys())
-            categorias_atualizadas = ["All"] + [nome for id_, nome in novos_id_para_nome.items()]
-            self.categorias = categorias_atualizadas
+            messagebox.showinfo("Sucesso", "Task editada com sucesso!")
+            janela_editar.destroy()
+        else:
+            messagebox.showwarning("Erro", "Por favor, preencha todos os campos.")
 
-            ids_removidos = set(self.id_to_nome.keys()) - self.ids_atualizados
-
-            for id_ in ids_removidos:
-                nome = self.id_to_nome[id_]
-                if nome in self.categorias:
-                    self.categorias.remove(nome)
-                del self.id_to_nome[id_]
-
-            self.id_to_nome.update(novos_id_para_nome)
-
-        except FileNotFoundError:
-            print("O arquivo categorias.txt não foi encontrado.")
-
-    def get_categorias(self):
-        return self.categorias
-
-
-
-def salvar_edicao(task, janela_editar):
-    task_id = task["id"]
-    novo_nome = entry_nome.get().strip()
-    nova_prioridade = cmb_prioridade.get()
-    novo_prazo = entry_prazo.get().strip()
-    novo_autor = entry_autor.get().strip()
-    nova_categoria = cmb_categoria.get().strip()
-
-    if novo_nome and nova_prioridade != "Selecione a Prioridade" and novo_prazo and novo_autor:
-        with open("tasks.txt", "r", encoding="utf-8") as arquivo:
-            linhas = arquivo.readlines()
-
-        with open("tasks.txt", "w", encoding="utf-8") as arquivo:
-            skip_lines = False
-            for linha in linhas:
-                if linha.startswith('Id: '):
-                    current_id = linha.strip().split(': ', 1)[1]
-                    skip_lines = current_id == task_id
-                if skip_lines and linha.startswith('Nome da task:'):
-                    arquivo.write(f"Nome da task: {novo_nome}\n")
-                elif skip_lines and linha.startswith('Prioridade:'):
-                    arquivo.write(f"Prioridade: {nova_prioridade}\n")
-                elif skip_lines and linha.startswith('Prazo:'):
-                    arquivo.write(f"Prazo: {novo_prazo}\n")
-                elif skip_lines and linha.startswith('Autor:'):
-                    arquivo.write(f"Autor: {novo_autor}\n")
-                elif skip_lines and linha.startswith('Categoria:'):
-                    arquivo.write(f"Categoria: {nova_categoria}\n")
-                elif skip_lines and linha.strip() == "":
-                    arquivo.write("\n")
-                    skip_lines = False
-                else:
-                    arquivo.write(linha)
-
-        messagebox.showinfo("Sucesso", "Task editada com sucesso!")
-        janela_editar.destroy()
     else:
-        messagebox.showwarning("Erro", "Por favor, preencha todos os campos.")
+        print("Task não encontrada.")
+        
 
+def buscar_id_por_nome(nome_task):
+    with open('tasks.txt', 'r', encoding="utf-8") as f:
+        conteudo = f.read().split('\n\n')  
+        for task in conteudo:
+            linhas = task.split('\n')
+            if len(linhas) >= 2:
+                id_ = linhas[0].split(': ')[1]
+                nome = linhas[1].split(': ')[1]
+                if nome == nome_task:
+                    return id_
+    for e in cria_tasks.tasks:
+        if e['nome'] == nome_task:
+            return e['id']
+    return None
+       
 def abrir_janela_editar_task(root, task):
     janela_editar = tk.Toplevel(root)
     janela_editar.title("Editar Task")
@@ -102,7 +66,7 @@ def abrir_janela_editar_task(root, task):
     lbl_nome = tk.Label(janela_editar, text="Nome:", bg="#d3d3d3", anchor="w")
     lbl_nome.pack(pady=(10, 5), padx=20, anchor="w")
     entry_nome = tk.Entry(janela_editar, width=40)
-    entry_nome.insert(0, task["task"])
+    entry_nome.insert(0, task["nome"])
     entry_nome.pack(padx=20, pady=5)
 
     lbl_prioridade = tk.Label(janela_editar, text="Prioridade:", bg="#d3d3d3", anchor="w")
@@ -114,7 +78,7 @@ def abrir_janela_editar_task(root, task):
     lbl_prazo = tk.Label(janela_editar, text="Prazo:", bg="#d3d3d3", anchor="w")
     lbl_prazo.pack(pady=(10, 5), padx=20, anchor="w")
     entry_prazo = tk.Entry(janela_editar, width=40)
-    entry_prazo.insert(0, task["data"])
+    entry_prazo.insert(0, task["prazo"])
     entry_prazo.pack(padx=20, pady=5)
 
     def escolher_data():
@@ -173,14 +137,13 @@ def abrir_janela_editar_task(root, task):
     cmb_categoria.pack(padx=20, pady=5) 
     
     def atualizar_combobox():
-        if janela_editar.winfo_exists(): 
-            atualizador.atualizar_categorias()
-            cmb_categoria['values'] = atualizador.get_categorias()
+        if janela_editar.winfo_exists():
+            nomes_categorias = [categoria["nome"] for categoria in gerencia_categorias.categorias] 
+            cmb_categoria['values'] = nomes_categorias
             janela_editar.after(2000, atualizar_combobox)  
 
-    atualizador = CategoriaAtualizador()
     atualizar_combobox()
 
 
-    btn_salvar = tk.Button(janela_editar, text="Salvar Edição", command=lambda: salvar_edicao(task, janela_editar), bg="#f0f0f0")
+    btn_salvar = tk.Button(janela_editar, text="Salvar Edição", command=lambda: editar_task(buscar_id_por_nome(task["nome"]), janela_editar), bg="#f0f0f0")
     btn_salvar.pack(pady=20)

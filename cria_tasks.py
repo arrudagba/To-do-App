@@ -5,48 +5,11 @@ from tkcalendar import Calendar
 from tktimepicker import AnalogPicker, AnalogThemes, constants
 import random
 import string
+import gerencia_categorias
 
-__all__ = ['abrir_janela_nova_task']
+tasks = []
 
-class CategoriaAtualizador:
-    def __init__(self):
-        self.categorias = ["All"]
-        self.id_to_nome = {}  
-        self.ids_atualizados = set()  
-
-    def atualizar_categorias(self):
-        novos_id_para_nome = {}
-        try:
-            with open("categorias.txt", "r") as file:
-                categoria = {}
-                for line in file:
-                    if line.startswith("Id:"):
-                        categoria_id = line.split("Id:")[1].strip()
-                        categoria["id"] = categoria_id
-                    elif line.startswith("Nome:"):
-                        categoria_nome = line.split("Nome:")[1].strip()
-                        categoria["nome"] = categoria_nome
-                        novos_id_para_nome[categoria["id"]] = categoria["nome"]
-
-            self.ids_atualizados = set(novos_id_para_nome.keys())
-            categorias_atualizadas = ["All"] + [nome for id_, nome in novos_id_para_nome.items()]
-            self.categorias = categorias_atualizadas
-
-            ids_removidos = set(self.id_to_nome.keys()) - self.ids_atualizados
-
-            for id_ in ids_removidos:
-                nome = self.id_to_nome[id_]
-                if nome in self.categorias:
-                    self.categorias.remove(nome)
-                del self.id_to_nome[id_]
-
-            self.id_to_nome.update(novos_id_para_nome)
-
-        except FileNotFoundError:
-            print("O arquivo categorias.txt não foi encontrado.")
-
-    def get_categorias(self):
-        return self.categorias
+__all__ = ['tasks']
 
 def gerar_id():
     caracteres = string.ascii_letters + string.digits 
@@ -58,16 +21,17 @@ def criar_task():
     prioridade_task = cmb_prioridade.get()
     prazo_task = entry_prazo.get().strip()
     autor_task = entry_autor.get().strip()
-    categoria_task = cmb_categoria.get()  
-
+    categoria_task = cmb_categoria.get()
     if nome_task and prioridade_task != "Selecione a Prioridade" and prazo_task and autor_task:
-        with open("tasks.txt", "a", encoding="utf-8") as file:
-            file.write(f"Id: {gerar_id()}\n")
-            file.write(f"Nome da task: {nome_task}\n")
-            file.write(f"Prioridade: {prioridade_task}\n")
-            file.write(f"Autor: {autor_task}\n")
-            file.write(f"Prazo: {prazo_task}\n")
-            file.write(f"Categoria: {categoria_task}\n\n")  
+        task = {
+            "id": gerar_id(),
+            "nome": nome_task,
+            "prioridade": prioridade_task,
+            "autor": autor_task,
+            "prazo": prazo_task,
+            "categoria": categoria_task
+            }
+        tasks.append(task)
         messagebox.showinfo("Sucesso", "Task criada e salva com sucesso!")
         
         if entry_nome.winfo_exists():
@@ -81,6 +45,86 @@ def criar_task():
     else:
         messagebox.showwarning("Erro", "Por favor, preencha todos os campos.")
 
+
+def ver_tasks():
+    global tasks
+    if not tasks:
+        print("Nenhuma task encontrada.")
+    else:
+        for task in tasks:
+            print(f"ID: {task['id']}, Nome: {task['nome']}, Prioridade: {task['prioridade']}, Autor: {task['autor']}, Prazo: {task['prazo']}, Categoria: {task['categoria']}")
+
+def deletar_task(task_id):
+    global tasks
+    tasks = [task for task in tasks if task['id'] != task_id]
+    
+def buscar_id_por_nome(nome_task):
+    with open('tasks.txt', 'r', encoding="utf-8") as f:
+        conteudo = f.read().split('\n\n')  
+        for task in conteudo:
+            linhas = task.split('\n')
+            if len(linhas) >= 2:
+                id_ = linhas[0].split(': ')[1]
+                nome = linhas[1].split(': ')[1]
+                if nome == nome_task:
+                    return id_
+    for e in tasks:
+        if e['nome'] == nome_task:
+            return e['id']
+    return None
+
+
+def carregar_tasks():
+    try:
+        with open('tasks.txt', 'r', encoding="utf-8") as f:
+            conteudo = f.read().strip()  
+            if not conteudo:
+                return
+            
+            tasks_arq = conteudo.split('\n\n')  
+            for task in tasks_arq:
+                linhas = task.split('\n')
+                
+                if len(linhas) < 6:
+                    print("Dados da task incompletos, ignorando entrada.")
+                    continue  
+                
+                try:
+                    id_ = linhas[0].split(': ')[1]
+                    nome = linhas[1].split(': ')[1]
+                    prioridade = linhas[2].split(': ')[1]
+                    autor = linhas[3].split(': ')[1]
+                    prazo = linhas[4].split(': ')[1]
+                    categoria = linhas[5].split(': ')[1]
+                    
+                    tasks.append({
+                        'id': id_,
+                        'nome': nome,
+                        'prioridade': prioridade,
+                        'autor': autor,
+                        'prazo': prazo,
+                        'categoria': categoria
+                    })
+                except IndexError:
+                    print("Erro ao processar dados de uma task. Ignorando esta entrada.")
+                    continue
+
+    except FileNotFoundError:
+        return 
+    
+def menu_gerencia_tasks():
+    while True:
+        ação = int(input("Digite o que quer: \n\n1- Criar task\n2- Ver tasks\n3- Deletar task\n4- Menu Principal\n\n"))
+        if ação == 1:
+            criar_task()
+        elif ação == 2:
+            ver_tasks()
+        elif ação == 3:
+            id = buscar_id_por_nome(input("Digite o nome da task que deseja deletar: "))
+            deletar_task(id)
+        elif ação == 4:
+            break
+    
 def abrir_janela_nova_task(root):
     janela_nova_task = tk.Toplevel(root)
     janela_nova_task.title("Nova Task")
@@ -170,11 +214,10 @@ def abrir_janela_nova_task(root):
 
     def atualizar_combobox():
         if janela_nova_task.winfo_exists(): 
-            atualizador.atualizar_categorias()
-            cmb_categoria['values'] = atualizador.get_categorias()
+            nomes_categorias = [categoria["nome"] for categoria in gerencia_categorias.categorias]
+            cmb_categoria['values'] = nomes_categorias
             janela_nova_task.after(2000, atualizar_combobox)  
 
-    atualizador = CategoriaAtualizador()
     atualizar_combobox()
 
     btn_criar = tk.Button(janela_nova_task, text="Criar Task", command=criar_task, bg="#f0f0f0")
