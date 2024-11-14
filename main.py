@@ -1,15 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
-import cria_tasks
+import tasks
 import tasks_concluidas
-import edita_tasks
 import gerencia_categorias
 
 categoria = "All"  
 
 def salvar_tasks():
     with open("tasks.txt", "w", encoding="utf-8") as file:
-        for e in cria_tasks.tasks:
+        for e in tasks.tasks:
             file.write(f"Id: {e['id']}\n")
             file.write(f"Nome da task: {e['nome']}\n")
             file.write(f"Prioridade: {e['prioridade']}\n")
@@ -38,7 +37,7 @@ root.resizable(False, False)
 root.configure(bg="#d3d3d3")  
 
 def nova_task():
-    cria_tasks.abrir_janela_nova_task(root)
+    tasks.abrir_janela_nova_task(root)
 
 def ver_tasks_concluidas():
     tasks_concluidas.abrir_janela_concluidas(root)
@@ -47,18 +46,18 @@ def criar_categoria():
     gerencia_categorias.abrir_janela_gerenciar_categorias(root)  
 
 def editar_task(task):
-    edita_tasks.abrir_janela_editar_task(root, task)
+    tasks.abrir_janela_editar_task(root, task)
 
 def atualizar_tasks(categoria):
     for widget in frame_tasks.winfo_children():
         widget.destroy()
 
     
-    prioridades_ordem = {"Alta": 1, "Media": 2, "Baixa": 3}
+    prioridades_ordem = {"Alta": 1, "Média": 2, "Baixa": 3}
 
-    cria_tasks.tasks.sort(key=lambda t: prioridades_ordem.get(t["prioridade"], 3)) 
+    tasks.tasks.sort(key=lambda t: prioridades_ordem.get(t["prioridade"], 3)) 
 
-    for task in cria_tasks.tasks:
+    for task in tasks.tasks:
         if categoria == "All" or task['categoria'] == categoria:
             frame_task = tk.Frame(frame_tasks, bg="#f0f0f0", pady=5)
             frame_task.pack(fill=tk.X, padx=5, pady=5)
@@ -89,10 +88,10 @@ def atualizar_tasks(categoria):
             btn_editar = tk.Button(frame_task, text="Editar", command=lambda t=task: editar_task(t), bg="#f0f0f0")
             btn_editar.grid(row=1, column=4, padx=(10, 5), sticky="e")  
 
-            btn_concluir = tk.Button(frame_task, text="Concluir", command=lambda t=task: tasks_concluidas.concluir_task(cria_tasks.buscar_id_por_nome(t["nome"])), bg="#f0f0f0")
+            btn_concluir = tk.Button(frame_task, text="Concluir", command=lambda t=task: tasks_concluidas.concluir_task(tasks.buscar_id_por_nome(t["nome"])), bg="#f0f0f0")
             btn_concluir.grid(row=1, column=5, padx=(10, 5), sticky="e")
 
-            btn_deletar = tk.Button(frame_task, text="Deletar", command=lambda t=task: cria_tasks.deletar_task(cria_tasks.buscar_id_por_nome(t["nome"])), bg="#f0f0f0")
+            btn_deletar = tk.Button(frame_task, text="Deletar", command=lambda t=task: tasks.deletar_task(tasks.buscar_id_por_nome(t["nome"])), bg="#f0f0f0")
             btn_deletar.grid(row=1, column=6, padx=(5, 0), sticky="e")
 
 frame_top = tk.Frame(root, bg="#d3d3d3")
@@ -154,7 +153,7 @@ frame_tasks.bind("<Configure>", lambda e: canvas_tasks.configure(scrollregion=ca
 
 
 if __name__ == "__main__":
-    cria_tasks.carregar_tasks()
+    tasks.carregar_tasks()
     tasks_concluidas.carregar_tasks_concluidas()
     gerencia_categorias.carregar_categorias()
     atualizar_combobox()

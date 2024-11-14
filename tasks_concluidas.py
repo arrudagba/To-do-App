@@ -1,20 +1,20 @@
 import tkinter as tk
-import cria_tasks
+import tasks
 
 tasks_concluidas = []
 
-__all_ = ['tasks_concluidas']
+__all__ = ['tasks_concluidas']
 
 def concluir_task(id):
     task_para_concluir = None
-    for task in cria_tasks.tasks:
+    for task in tasks.tasks:
         if task['id'] == id:
             task_para_concluir = task
             break
 
     if task_para_concluir:
         tasks_concluidas.append(task_para_concluir)  
-        cria_tasks.tasks = [task for task in cria_tasks.tasks if task['id'] != id]  
+        tasks.tasks = [task for task in tasks.tasks if task['id'] != id]  
     else:
         print("Task não encontrada.")
 
@@ -27,7 +27,7 @@ def voltar_task(id):
             break
 
     if task_para_voltar:
-        cria_tasks.tasks.append(task_para_voltar)  
+        tasks.tasks.append(task_para_voltar)  
         tasks_concluidas = [task for task in tasks_concluidas if task['id'] != id]  
     else:
         print("Task não encontrada.")
